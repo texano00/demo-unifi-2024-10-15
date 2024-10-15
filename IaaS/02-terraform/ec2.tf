@@ -11,6 +11,6 @@ resource "aws_instance" "app_server" {
   key_name = "unifi-test" # Specify the existing key pair
 
   tags = {
-    Name = "${local.resource_prefix}-iaas-ec2"
+    Name = "${local.resource_prefix}iaas-ec2"
   }
 }

@@ -20,6 +20,8 @@ pip3 install boto3 flask gunicorn
 export AWS_DEFAULT_REGION=eu-central-1
 export FLASK_RUN_HOST=0.0.0.0
 flask --app main run
+or
+gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon
 ```
 * test it! postman collection
 
