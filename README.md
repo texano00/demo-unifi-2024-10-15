@@ -44,6 +44,14 @@ terraform init
 terraform apply --var-file=env/development.tfvars
 terraform apply --var-file=env/production.tfvars
 
+```
+export DYNAMODB_TABLE_NAME=${tableName}
+export AWS_DEFAULT_REGION=eu-central-1
+export FLASK_RUN_HOST=0.0.0.0
+flask --app main run
+or
+gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon
+```
 
 ## FaaS
 ### Architecture

@@ -5,9 +5,10 @@ resource "aws_instance" "app_server" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
 
-  user_data = templatefile("userdata.sh", {
-    "tableName" : aws_dynamodb_table.demo_table.name
-  })
+# TODO: feature (automatically startup the service)
+#   user_data = templatefile("userdata.sh", {
+#     "tableName" : aws_dynamodb_table.demo_table.name
+#   })
   key_name = "unifi-test" # Specify the existing key pair
 
   tags = {

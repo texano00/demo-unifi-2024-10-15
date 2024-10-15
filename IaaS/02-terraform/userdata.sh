@@ -10,8 +10,27 @@ pip3 install boto3 flask gunicorn
 mkdir -p /home/ec2-user/app
 cd /home/ec2-user/app
 
-wget -O https://raw.githubusercontent.com/texano00/demo-unifi-2024-10-15/refs/heads/main/IaaS/02-terraform/source/main.py main.py
+wget https://raw.githubusercontent.com/texano00/demo-unifi-2024-10-15/refs/heads/main/IaaS/02-terraform/source/main.py
 
+cat <<EOF2 > /etc/systemd/system/crudapp.service
+[Unit]
+    Description=crudapp
+    After=network-online.target
+[Service]
+    WorkingDirectory=/home/ec2-user/app
+    Type=exec
+    User=ec2-user
+    ExecStart=/bin/sh -c 'gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon'
+    RestartSec=30
+    RestartSteps=20
+    RestartMaxDelaySec=600
+    Restart=always
+[Install]
+    WantedBy=multi-user.target
+EOF2
+
+systemctl daemon-reload
+systemctl enable crudapp.service
 
 # # Create the Flask app
 # cat <<EOF2 > /home/ec2-user/app/main.py
@@ -68,7 +87,8 @@ wget -O https://raw.githubusercontent.com/texano00/demo-unifi-2024-10-15/refs/he
 # EOF2
 
 # Start Gunicorn to serve the Flask app
-export DYNAMODB_TABLE_NAME=${tableName} \
-export AWS_DEFAULT_REGION=eu-central-1 \ 
-export FLASK_RUN_HOST=0.0.0.0 \
-gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon
+# export DYNAMODB_TABLE_NAME=${tableName}
+# export AWS_DEFAULT_REGION=eu-central-1 
+# export FLASK_RUN_HOST=0.0.0.0
+
+# gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon
