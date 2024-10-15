@@ -1,6 +1,10 @@
 # demo-unifi-2024-10-15
-
 ## IaaS
+
+### Architecture
+![alt text](assets/iaas-ddb-crud.png)
+
+### Manual (bad way)
 
 * create dynamodb table
 * create ec2 instance
@@ -24,6 +28,22 @@ or
 gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon
 ```
 * test it! postman collection
+
+### IaC (right way)
+#### Login
+cd IaaS
+
+```
+export AWS_REGION=eu-central-1
+export AWS_ACCESS_KEY_ID=***
+export AWS_SECRET_ACCESS_KEY=***
+```
+
+#### Terraform
+terraform init
+terraform apply --var-file=env/development.tfvars
+terraform apply --var-file=env/production.tfvars
+
 
 ## FaaS
 ### Architecture

@@ -68,6 +68,7 @@ wget -O https://raw.githubusercontent.com/texano00/demo-unifi-2024-10-15/refs/he
 # EOF2
 
 # Start Gunicorn to serve the Flask app
-export AWS_DEFAULT_REGION=eu-central-1
-export FLASK_RUN_HOST=0.0.0.0
+export DYNAMODB_TABLE_NAME=${tableName} \
+export AWS_DEFAULT_REGION=eu-central-1 \ 
+export FLASK_RUN_HOST=0.0.0.0 \
 gunicorn -w 15 -b 0.0.0.0:5000 main:app --daemon

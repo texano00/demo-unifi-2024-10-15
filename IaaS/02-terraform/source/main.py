@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 import boto3
+import os
 
 app = Flask(__name__)
 
 dynamodb = boto3.resource('dynamodb')
-table_name = "${tableName}"
+table_name = os.environ['DYNAMODB_TABLE_NAME']
 table = dynamodb.Table(table_name)
 
 @app.route('/create', methods=['POST'])
