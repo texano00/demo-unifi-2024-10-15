@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emulatorjs
+  namespace: my-project
+spec:
+  selector:
+    matchLabels:
+      app: emulatorjs
+  template:
+    metadata:
+      labels:
+        app: emulatorjs
+    spec:
+      containers:
+      - name: emulatorjs
+        image: lscr.io/linuxserver/emulatorjs:latest
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /data
+          name: data-volume
+      volumes:
+      - name: data-volume
+        emptyDir: {}

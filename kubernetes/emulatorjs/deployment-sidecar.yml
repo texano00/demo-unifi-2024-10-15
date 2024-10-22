@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emulatorjs
+  namespace: my-project
+spec:
+  selector:
+    matchLabels:
+      app: emulatorjs
+  template:
+    metadata:
+      labels:
+        app: emulatorjs
+    spec:
+      containers:
+      - name: emulatorjs
+        image: lscr.io/linuxserver/emulatorjs:latest
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /data
+          name: data-volume
+      - name: downloader
+        image: python:3.11-alpine
+        ports:
+        - containerPort: 9000
+        command: [ "python3", "-u", "-c" ]
+        args:
+          - |
+            import http.server
+            import socketserver
+            import urllib.request
+            import os
+
+            class Handler(http.server.SimpleHTTPRequestHandler):
+                def do_GET(self):
+                    if self.path == '/init-roms':
+
+                        # n64
+                        dir_path = '/data/n64/roms'
+                        filename = os.path.join(dir_path, 'mario_kart')
+                        url = 'https://drive.google.com/file/d/1LPNc_FUeKE-3JJKEm6j6amkC6Y8bdpCM/view?usp=drive_link'
+                        
+                        # Create directories if they do not exist
+                        os.makedirs(dir_path, exist_ok=True)
+                        
+                        if not os.path.exists(filename):
+                            urllib.request.urlretrieve(url, filename)
+                            message = b'File downloaded successfully.'
+                        else:
+                            message = b'File already exists.'
+                        # NES
+                        dir_path = '/data/nes/roms'
+                        filename = os.path.join(dir_path, 'pacman.nes')
+                        url = 'https://drive.google.com/file/d/1MLALA7x-olibuZX6IvDcm-LOh7Pfn7nv/view?usp=drive_link'
+                        
+                        # Create directories if they do not exist
+                        os.makedirs(dir_path, exist_ok=True)
+                        
+                        if not os.path.exists(filename):
+                            urllib.request.urlretrieve(url, filename)
+                            message = b'File downloaded successfully.'
+                        else:
+                            message = b'File already exists.'
+
+                        self.send_response(200)
+                        self.end_headers()
+                        self.wfile.write(message)
+                    else:
+                        self.send_response(404)
+                        self.end_headers()
+                        self.wfile.write(b'Not found')
+
+            with socketserver.TCPServer(("", 9000), Handler) as httpd:
+                print("Serving on port 9000")
+                httpd.serve_forever()
+        volumeMounts:
+        - mountPath: /data
+          name: data-volume
+      # - name: emulatorjs-sidecar
+      #   image: alpine/curl:latest
+      #   command: ["/bin/sh", "-c"]
+      #   args:
+      #     - |
+      #       curl https://drive.google.com/file/d/1LPNc_FUeKE-3JJKEm6j6amkC6Y8bdpCM/view?usp=drive_link -o /data/n64/roms/mario_kart && \
+      #       echo "File downloaded successfully."
+      #   ports:
+      #   - containerPort: 80
+      #   volumeMounts:
+      #   - mountPath: /data
+      #     name: data-volume
+      volumes:
+      - name: data-volume
+        emptyDir: {}

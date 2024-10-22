@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: emulatorjs
+  namespace: my-project
+spec:
+  selector:
+    app: emulatorjs
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: rom
+    port: 3000
+    targetPort: 3000
+  - name: sidecar
+    port: 9000
+    targetPort: 9000
